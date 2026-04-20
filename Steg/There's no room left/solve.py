@@ -1,4 +1,16 @@
-s = open('flag.txt', 'r', encoding='utf-8').read()
-zw = ''.join(c for c in s if ord(c) in (0x200b, 0x200c))
-bits = ''.join('0' if ord(c)==0x200b else '1' for c in zw)
-print(''.join(chr(int(bits[i:i+8],2)) for i in range(0,len(bits),8) if len(bits[i:i+8])==8))
+from pathlib import Path
+import unicodedata
+
+s = Path("flag.txt").read_text("utf-8")
+cf = [ch for ch in s if unicodedata.category(ch) == "Cf"]
+
+mp = {
+    0x200c: '0',
+    0x200d: '1',
+    0x202c: '2',
+    0xfeff: '3',
+}
+
+digits = ''.join(mp[ord(ch)] for ch in cf)
+out = bytes(int(digits[i:i+8], 4) for i in range(0, len(digits), 8))
+print(out.decode())
